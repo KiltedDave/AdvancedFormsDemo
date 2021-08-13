@@ -1,4 +1,8 @@
 ﻿@page "/cascadedemo"
+
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
 <h3>CascadeDemo</h3>
 
 <EditForm Model="@cascade">
@@ -11,7 +15,7 @@
     </select>
     @if (subTypes.Count > 0)
     {
-        <select @onchange="HandleSecondDropDownChange">
+        <select id="secondDropDown" @onchange="HandleSecondDropDownChange">
             <option value="">Select Sub Type...</option>
             @foreach (var s in subTypes)
             {
@@ -42,8 +46,12 @@
         cascade.SecondId= int.Parse(e.Value.ToString());
     }
 
-    private void HandleFirstDropDownChange(ChangeEventArgs e)
+    private async Task HandleFirstDropDownChange(ChangeEventArgs e)
     {
+
+        cascade.SecondId = 0;
+        subTypes = new Dictionary<int, string>();
+
         if (string.IsNullOrWhiteSpace(e.Value.ToString()))
         {
             cascade.FirstId = 0;
@@ -77,6 +85,7 @@
                 subTypes = new Dictionary<int, string>();
                 break;
         }
+        await JSRuntime.InvokeAsync<object>("ResetSecondDropDown", new object[0]);
     }
 
 }
